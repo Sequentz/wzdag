@@ -12,15 +12,20 @@ class ImageController extends Controller
      */
     public function index()
     {
-        //
+        // Haal de afbeeldingen op met paginatie
+        $images = Image::sortable()->paginate(10);
+
+        // Retourneer de index view met de afbeeldingen
+        return view('images', compact('images'));
     }
+
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-        //
+        return view('images.create');
     }
 
     /**
@@ -85,6 +90,9 @@ class ImageController extends Controller
      */
     public function destroy(Image $image)
     {
-        //
+
+        $image->delete();
+
+        return back()->with('success', 'Image deleted successfully.');
     }
 }

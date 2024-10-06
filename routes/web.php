@@ -28,4 +28,4 @@ Route::middleware([
     })->name('dashboard');
 });
 
-// Route::resource('images', ImageController::class);
+Route::resource('images', ImageController::class);
