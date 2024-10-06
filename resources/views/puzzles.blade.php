@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <a href="{{ route('images.create') }}" class="align-middle bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded float-right">Add image</a>
+        <a href="{{ route('puzzles.create') }}" class="align-middle bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded float-right">Add puzzle</a>
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Add image') }}
+            {{ __('Manage puzzles') }}
         </h2>
     </x-slot>
 
@@ -12,46 +12,38 @@
                 <tr>
                     <th class="px-6 py-3 text-left text-sm font-medium">ID</th>
                     <th class="px-6 py-3 text-left text-sm font-medium">Name</th>
-                    <th class="px-6 py-3 text-left text-sm font-medium">Preview</th>
                     <th class="px-6 py-3 text-left text-sm font-medium">Edit</th>
                     <th class="px-6 py-3 text-left text-sm font-medium">Delete</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
-                @if($images->count() > 0)
-                @foreach($images as $image)
+                @if($puzzles->count() > 0)
+                @foreach($puzzles as $puzzle)
                 <tr class="hover:bg-gray-100">
-                    <td class="px-6 py-4 text-sm text-gray-900">{{ $image->id }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900">{{ $image->file_name }}</td>
-
-                    <!-- Image Preview -->
-                    <td class="px-6 py-4 text-sm text-gray-900">
-                        <a href="javascript:void(0);" class="open-preview-modal" data-id="{{ $image->id }}" data-file="{{ asset('storage/' . $image->file_path) }}">
-                            <img src="{{ asset('storage/' . $image->file_path) }}" alt="Preview" class="w-16 h-16 object-cover">
-                        </a>
-                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-900">{{ $puzzle->id }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">{{ $puzzle->name }}</td>
 
                     <td class="px-6 py-4 text-sm text-gray-900">
-                        <a href="{{ route('images.edit', $image->id) }}" class="text-blue-500 hover:text-blue-700">✏️</a>
+                        <a href="{{ route('puzzles.edit', $puzzle->id) }}" class="text-blue-500 hover:text-blue-700">✏️</a>
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-900">
-                        <button type="button" class="open-delete-modal hover:bg-red-700 text-white font-bold py-2 px-4 rounded" data-id="{{ $image->id }}" data-name="{{ $image->file_name }}">
+                        <button type="button" class="open-delete-modal hover:bg-red-700 text-white font-bold py-2 px-4 rounded" data-id="{{ $puzzle->id }}" data-name="{{ $puzzle->name }}">
                             🗑️
                         </button>
                     </td>
                 </tr>
                 @endforeach
                 @else
-                <!-- If no images are found, display this message -->
+                <!-- If no puzzles are found, display this message -->
                 <tr>
-                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">No images available</td>
+                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">No puzzles available</td>
                 </tr>
                 @endif
             </tbody>
         </table>
     </div>
 
-    <!-- Delete Modal (Shared by All Images) -->
+    <!-- Delete Modal (Shared by All puzzles) -->
     <div id="deleteModal" class="modal hidden fixed z-50 left-0 top-0 w-full h-full overflow-auto bg-black bg-opacity-75  items-center justify-center">
         <div class="bg-white p-4 rounded shadow-lg max-w-lg w-full">
             <span class="close-delete-modal float-right cursor-pointer bg-red-500 w-8 mb-2 h-auto text-white rounded-sm text-center text-lg">&times;</span>
@@ -64,38 +56,11 @@
             </form>
         </div>
     </div>
-
-    <!-- Image Preview Modal (Shared by All Images) -->
-    <div id="imagePreviewModal" class="modal hidden fixed z-50 left-0 top-0 w-full h-full overflow-auto bg-black bg-opacity-75  items-center justify-center">
-        <div class="bg-white p-4 rounded shadow-lg max-w-lg w-full">
-            <span class="close-preview-modal float-right cursor-pointer bg-red-500 w-8 mb-2 h-auto text-white rounded-sm text-center text-lg">&times;</span>
-            <img id="imagePreview" src="" alt="Image Preview" class="w-full h-auto">
-        </div>
-    </div>
 </x-app-layout>
 
-<!-- JavaScript to Handle Modal Logic -->
+<!-- JavaScript to Handle Delete Modal -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Handle Image Preview Modal
-        const previewModal = document.getElementById('imagePreviewModal');
-        const previewImage = document.getElementById('imagePreview');
-        const openPreviewModalLinks = document.querySelectorAll('.open-preview-modal');
-        const closePreviewModalButton = document.querySelector('.close-preview-modal');
-
-        openPreviewModalLinks.forEach(link => {
-            link.addEventListener('click', function() {
-                const fileSrc = this.getAttribute('data-file');
-                previewImage.setAttribute('src', fileSrc);
-                previewModal.classList.remove('hidden');
-            });
-        });
-
-        closePreviewModalButton.addEventListener('click', function() {
-            previewModal.classList.add('hidden');
-        });
-
-        // Handle Delete Modal
         const deleteModal = document.getElementById('deleteModal');
         const deleteForm = document.getElementById('deleteForm');
         const deleteFileName = document.getElementById('deleteFileName');
@@ -108,7 +73,7 @@
                 const fileId = this.getAttribute('data-id');
 
                 deleteFileName.textContent = fileName;
-                deleteForm.setAttribute('action', `/images/${fileId}`);
+                deleteForm.setAttribute('action', `/puzzles/${fileId}`);
                 deleteModal.classList.remove('hidden');
             });
         });
@@ -125,13 +90,6 @@
                 const modalContent = deleteModal.querySelector('.bg-white');
                 if (!modalContent.contains(event.target)) {
                     deleteModal.classList.add('hidden');
-                }
-            }
-
-            if (previewModal.contains(event.target)) {
-                const modalContent = previewModal.querySelector('.bg-white');
-                if (!modalContent.contains(event.target)) {
-                    previewModal.classList.add('hidden');
                 }
             }
         });
