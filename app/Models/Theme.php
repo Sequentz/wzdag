@@ -19,4 +19,8 @@ class Theme extends Model
     {
         return $this->hasMany(Image::class);
     }
+    public function puzzles()
+    {
+        return $this->hasMany(Puzzle::class);
+    }
 }

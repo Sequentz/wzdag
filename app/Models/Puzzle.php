@@ -13,8 +13,14 @@ class Puzzle extends Model
     use HasFactory;
     use Sortable;
 
-    public function woorden()
+    protected $fillable = [
+
+        'name',
+        'theme_id',
+    ];
+
+    public function words()
     {
-        return $this->belongsToMany(Word::class, 'puzzle_woord');
+        return $this->belongsToMany(Word::class, 'puzzle_word'); // Zorg dat de juiste tussentabel naam wordt gebruikt
     }
 }

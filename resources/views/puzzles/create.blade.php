@@ -16,10 +16,10 @@
 
       <!-- Thema Selectie -->
       <div class="mt-4">
-        <label for="puzzle_id" class="block mb-2 text-2xl font-medium text-gray-900">Select puzzle:</label>
-        <select name="puzzle_id" id="puzzle_id" required class="block w-full mt-1 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 rounded-md">
-          @foreach($puzzles as $puzzle)
-          <option value="{{ $puzzle->id }}">{{ $puzzle->name }}</option>
+        <label for="theme_id" class="block mb-2 text-2xl font-medium text-gray-900">Select Theme:</label>
+        <select name="theme_id" id="theme_id" required class="block w-full mt-1 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 rounded-md">
+          @foreach($themes as $theme)
+          <option value="{{ $theme->id }}">{{ $theme->name }}</option>
           @endforeach
         </select>
       </div>
