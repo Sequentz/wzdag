@@ -18,6 +18,7 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
+                @if($images->count() > 0)
                 @foreach($images as $image)
                 <tr class="hover:bg-gray-100">
                     <td class="px-6 py-4 text-sm text-gray-900">{{ $image->id }}</td>
@@ -25,7 +26,7 @@
 
                     <!-- Image Preview -->
                     <td class="px-6 py-4 text-sm text-gray-900">
-                        <a href="#imageModal-{{ $image->id }}" class="open-modal">
+                        <a href="javascript:void(0);" class="open-preview-modal" data-id="{{ $image->id }}" data-file="{{ asset('storage/' . $image->file_path) }}">
                             <img src="{{ asset('storage/' . $image->file_path) }}" alt="Preview" class="w-16 h-16 object-cover">
                         </a>
                     </td>
@@ -39,21 +40,18 @@
                         </button>
                     </td>
                 </tr>
-
-                <!-- Image Preview Modal -->
-                <div id="imageModal-{{ $image->id }}" class="modal hidden fixed z-50 left-0 top-0 w-full h-full overflow-auto bg-black bg-opacity-75 flex items-center justify-center">
-                    <div class="bg-white p-4 rounded shadow-lg max-w-lg w-full">
-                        <span class="close-modal float-right cursor-pointer bg-red-500 w-8 mb-2 h-auto text-white rounded-sm text-center text-lg">&times;</span>
-                        <img src="{{ asset('storage/' . $image->file_path) }}" alt="Image Preview" class="w-full h-auto">
-                    </div>
-                </div>
-
                 @endforeach
+                @else
+                <!-- If no images are found, display this message -->
+                <tr>
+                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">No images available</td>
+                </tr>
+                @endif
             </tbody>
         </table>
     </div>
 
-    <!-- Delete Modal -->
+    <!-- Delete Modal (Shared by All Images) -->
     <div id="deleteModal" class="modal hidden fixed z-50 left-0 top-0 w-full h-full overflow-auto bg-black bg-opacity-75 flex items-center justify-center">
         <div class="bg-white p-4 rounded shadow-lg max-w-lg w-full">
             <span class="close-delete-modal float-right cursor-pointer bg-red-500 w-8 mb-2 h-auto text-white rounded-sm text-center text-lg">&times;</span>
@@ -66,84 +64,74 @@
             </form>
         </div>
     </div>
+
+    <!-- Image Preview Modal (Shared by All Images) -->
+    <div id="imagePreviewModal" class="modal hidden fixed z-50 left-0 top-0 w-full h-full overflow-auto bg-black bg-opacity-75 flex items-center justify-center">
+        <div class="bg-white p-4 rounded shadow-lg max-w-lg w-full">
+            <span class="close-preview-modal float-right cursor-pointer bg-red-500 w-8 mb-2 h-auto text-white rounded-sm text-center text-lg">&times;</span>
+            <img id="imagePreview" src="" alt="Image Preview" class="w-full h-auto">
+        </div>
+    </div>
 </x-app-layout>
 
 <!-- JavaScript to Handle Modal Logic -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Get all open-modal links
-        const openModalLinks = document.querySelectorAll('.open-modal');
-        const closeModalButtons = document.querySelectorAll('.close-modal');
+        // Handle Image Preview Modal
+        const previewModal = document.getElementById('imagePreviewModal');
+        const previewImage = document.getElementById('imagePreview');
+        const openPreviewModalLinks = document.querySelectorAll('.open-preview-modal');
+        const closePreviewModalButton = document.querySelector('.close-preview-modal');
 
-        // Open image modal
-        openModalLinks.forEach(link => {
-            link.addEventListener('click', function(event) {
-                event.preventDefault();
-                const modalId = this.getAttribute('href').replace('#', '');
-                const modal = document.getElementById(modalId);
-                if (modal) {
-                    modal.classList.remove('hidden');
-                }
+        openPreviewModalLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                const fileSrc = this.getAttribute('data-file');
+                previewImage.setAttribute('src', fileSrc);
+                previewModal.classList.remove('hidden');
             });
         });
 
-        // Close image modal
-        closeModalButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const modal = this.closest('.modal');
-                modal.classList.add('hidden');
-            });
+        closePreviewModalButton.addEventListener('click', function() {
+            previewModal.classList.add('hidden');
         });
 
-        // Close modal when clicking outside the modal content
-        document.addEventListener('click', function(event) {
-            const modals = document.querySelectorAll('.modal');
-            modals.forEach(modal => {
-                if (modal.contains(event.target)) {
-                    if (!modal.querySelector('.bg-white').contains(event.target)) {
-                        modal.classList.add('hidden');
-                    }
-                }
-            });
-        });
-
-        // DELETE MODAL
-        const openDeleteModalButtons = document.querySelectorAll('.open-delete-modal');
-        const closeDeleteModalButtons = document.querySelectorAll('.close-delete-modal');
+        // Handle Delete Modal
         const deleteModal = document.getElementById('deleteModal');
         const deleteForm = document.getElementById('deleteForm');
         const deleteFileName = document.getElementById('deleteFileName');
+        const openDeleteModalButtons = document.querySelectorAll('.open-delete-modal');
+        const closeDeleteModalButtons = document.querySelectorAll('.close-delete-modal');
 
-        // Open delete modal
         openDeleteModalButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const fileName = this.getAttribute('data-name');
                 const fileId = this.getAttribute('data-id');
 
-                // Set the file name in the modal
                 deleteFileName.textContent = fileName;
-
-                // Set the form action to delete the correct image
                 deleteForm.setAttribute('action', `/images/${fileId}`);
-
-                // Show the delete modal
                 deleteModal.classList.remove('hidden');
             });
         });
 
-        // Close delete modal on cancel or close button
         closeDeleteModalButtons.forEach(button => {
             button.addEventListener('click', function() {
                 deleteModal.classList.add('hidden');
             });
         });
 
-        // Close delete modal when clicking outside the modal content
+        // Close modal when clicking outside the modal content
         document.addEventListener('click', function(event) {
             if (deleteModal.contains(event.target)) {
                 const modalContent = deleteModal.querySelector('.bg-white');
                 if (!modalContent.contains(event.target)) {
                     deleteModal.classList.add('hidden');
+                }
+            }
+
+            if (previewModal.contains(event.target)) {
+                const modalContent = previewModal.querySelector('.bg-white');
+                if (!modalContent.contains(event.target)) {
+                    previewModal.classList.add('hidden');
                 }
             }
         });
