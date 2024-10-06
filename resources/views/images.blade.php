@@ -14,7 +14,7 @@
                     <th class="px-6 py-3 text-left text-sm font-medium">Name</th>
                     <th class="px-6 py-3 text-left text-sm font-medium">Preview</th>
                     <th class="px-6 py-3 text-left text-sm font-medium">Edit</th>
-                    <th class="px-6 py-3 text-left text-sm font-medium">Delete</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium">Remove</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200" id="imageTableBody">
@@ -54,7 +54,7 @@
         <div id="deleteModal" class="modal hidden fixed z-50 left-0 top-0 w-full h-full overflow-auto bg-black bg-opacity-75 flex items-center justify-center">
             <div class="bg-white p-4 rounded shadow-lg max-w-lg w-full">
                 <span class="close-delete-modal float-right cursor-pointer bg-red-500 w-8 mb-2 h-auto text-white rounded-sm text-center text-lg">&times;</span>
-                <h2 class="text-lg mb-4">Are you sure you want to delete <span id="deleteFileName"></span>?</h2>
+                <h2 class="text-lg mb-4">Are you sure you want to delete<span id="deleteFileName"></span>?</h2>
                 <form id="deleteForm" method="POST" action="">
                     @csrf
                     @method('DELETE')
