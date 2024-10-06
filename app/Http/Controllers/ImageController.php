@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Image;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ImageController extends Controller
 {
@@ -74,16 +75,41 @@ class ImageController extends Controller
      */
     public function edit(Image $image)
     {
-        //
+        return view('images.edit', compact('image'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Image $image)
+    public function update(Request $request, $id)
     {
-        //
+        // Find the image by its ID
+        $image = Image::findOrFail($id);
+
+        // Validate the new image if one is provided
+        $request->validate([
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+        ]);
+
+        // Check if a new image file is uploaded
+        if ($request->hasFile('image')) {
+            // Delete the old image from storage
+            if ($image->file_path) {
+                Storage::delete('public/' . $image->file_path);
+            }
+
+            // Store the new image and update the file path
+            $filePath = $request->file('image')->store('images', 'public');
+            $image->file_path = $filePath;
+        }
+
+        // Save the changes to the database
+        $image->save();
+
+        // Redirect back to the images index with a success message
+        return redirect()->route('images.index')->with('success', 'Image updated successfully.');
     }
+
 
     /**
      * Remove the specified resource from storage.
