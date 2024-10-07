@@ -85,11 +85,15 @@ class PuzzleController extends Controller
     public function edit(Puzzle $puzzle)
     {
         // Haal alle thema's op
-        $themes = Theme::all(); // Zorg dat je het juiste Theme model gebruikt
+        $themes = Theme::all();
 
-        // Retourneer de view met de puzzel en thema's
-        return view('puzzles.edit', compact('puzzle', 'themes'));
+        // Haal alle afbeeldingen van het geselecteerde thema van de puzzel
+        $images = $puzzle->theme->images; // Zorg ervoor dat de relatie correct is ingesteld
+
+        // Retourneer de view met de puzzel, thema's en afbeeldingen
+        return view('puzzles.edit', compact('puzzle', 'themes', 'images'));
     }
+
 
 
     /**
@@ -101,6 +105,7 @@ class PuzzleController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'theme_id' => 'required|exists:themes,id',
+            'image_id' => 'required|exists:images,id', // Zorg ervoor dat de afbeelding bestaat
             'words' => 'array|min:1',
             'words.*' => 'string|max:255',
         ]);
@@ -109,10 +114,11 @@ class PuzzleController extends Controller
         $puzzle->update([
             'name' => $validated['name'],
             'theme_id' => $validated['theme_id'],
+            'image_id' => $validated['image_id'], // Update de gekoppelde afbeelding
         ]);
 
         // Update woorden
-        $puzzle->words()->detach(); // Oude woorden loskoppelen
+        $puzzle->words()->detach();
         foreach ($validated['words'] as $wordText) {
             $word = Word::firstOrCreate(['word' => $wordText]);
             $puzzle->words()->attach($word->id);
@@ -120,6 +126,7 @@ class PuzzleController extends Controller
 
         return redirect()->route('puzzles.index')->with('success', 'Puzzle updated successfully.');
     }
+
 
 
     /**

@@ -30,7 +30,22 @@
         </select>
       </div>
 
-      <!-- Edit Words Section -->
+      <!-- Image Selection -->
+      <div class="mt-4">
+        <label for="image_id" class="block mb-2 text-2xl font-medium text-gray-900">Select an Image:</label>
+        <div class="flex space-x-4">
+          @foreach($images as $image)
+          <div>
+            <input type="radio" name="image_id" id="image_{{ $image->id }}" value="{{ $image->id }}" {{ $image->id == $puzzle->image_id ? 'checked' : '' }}>
+            <label for="image_{{ $image->id }}">
+              <img src="{{ asset('storage/' . $image->file_path) }}" alt="Image" class="w-32 h-32 object-cover border rounded-lg">
+            </label>
+          </div>
+          @endforeach
+        </div>
+      </div>
+
+      <!-- Words Section -->
       <div class="mt-4">
         <label for="words" class="block mb-2 text-2xl font-medium text-gray-900">Edit Words:</label>
         @foreach($puzzle->words as $index => $word)
@@ -46,12 +61,10 @@
       </button>
     </form>
 
-    <!-- Success Message -->
     @if(session('success'))
     <p class="text-green-500 mt-4">{{ session('success') }}</p>
     @endif
 
-    <!-- Error Messages -->
     @if($errors->any())
     <ul class="mt-4">
       @foreach($errors->all() as $error)
