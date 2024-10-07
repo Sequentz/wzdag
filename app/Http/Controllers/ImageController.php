@@ -34,31 +34,36 @@ class ImageController extends Controller
      */
     public function store(Request $request)
     {
-
+        // Valideer de afbeeldingen
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
+        // Controleer of er bestanden zijn geüpload
+        if ($request->hasFile('images')) {
+            // Loop door elk bestand dat is geüpload
+            foreach ($request->file('images') as $file) {
+                // Haal het originele bestandsnaam, pad en extensie op
+                $filePath = $file->store('uploads', 'public'); // Sla het bestand op in de 'public/uploads' map
+                $fileName = $file->getClientOriginalName(); // Haal de originele bestandsnaam op
+                $fileExtension = $file->getClientOriginalExtension(); // Haal de bestandsextensie op
 
-        if ($request->file('image')) {
-            $file = $request->file('image');
-            $filePath = $file->store('uploads', 'public');
-            $fileName = $file->getClientOriginalName();
-            $fileExtension = $file->getClientOriginalExtension();
+                // Sla elke afbeelding op in de database
+                Image::create([
+                    'file_name' => $fileName, // De bestandsnaam
+                    'file_path' => $filePath, // Het bestandspad waar de afbeelding is opgeslagen
+                    'file_extension' => $fileExtension, // De extensie van het bestand
+                    'user_id' => auth()->id(),  // Voeg de ID van de huidige gebruiker toe
+                ]);
+            }
 
-
-            $image = Image::create([
-                'file_name' => $fileName,
-                'file_path' => $filePath,
-                'file_extension' => $fileExtension,
-                'user_id' => auth()->id(),
-            ]);
-
-            return back()->with('success', 'Image uploaded successfully.');
+            return back()->with('success', 'Images uploaded successfully.');
         }
 
-        return back()->withErrors('Please upload a valid image.');
+        return back()->withErrors('Please upload valid images.');
     }
+
+
 
 
     /**

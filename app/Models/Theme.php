@@ -15,12 +15,13 @@ class Theme extends Model
 
     protected $fillable = ['name'];
 
-    public function images()
-    {
-        return $this->hasMany(Image::class);
-    }
+
     public function puzzles()
     {
         return $this->hasMany(Puzzle::class);
+    }
+    public function images()
+    {
+        return $this->belongsToMany(Image::class, 'theme_image');
     }
 }

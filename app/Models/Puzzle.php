@@ -19,8 +19,20 @@ class Puzzle extends Model
         'theme_id',
     ];
 
+    public function theme()
+    {
+        return $this->belongsTo(Theme::class);
+    }
+
+
+    public function image()
+    {
+        return $this->belongsTo(Image::class);
+    }
+
+
     public function words()
     {
-        return $this->belongsToMany(Word::class, 'puzzle_word'); // Zorg dat de juiste tussentabel naam wordt gebruikt
+        return $this->belongsToMany(Word::class, 'puzzle_word');
     }
 }

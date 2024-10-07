@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('puzzles', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('theme_id')->constrained()->nullable();
-            $table->foreignId('image_id')->constrained()->nullable();
+            $table->foreignId('theme_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('image_id')->nullable()->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

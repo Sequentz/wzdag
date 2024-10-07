@@ -70,7 +70,13 @@ class PuzzleController extends Controller
      */
     public function show(Puzzle $puzzle)
     {
-        //
+
+        $theme = $puzzle->theme;
+        $image = $puzzle->image;
+        $words = $puzzle->words;
+
+
+        return view('puzzles.show', compact('puzzle', 'theme', 'image', 'words'));
     }
 
     /**
@@ -78,35 +84,43 @@ class PuzzleController extends Controller
      */
     public function edit(Puzzle $puzzle)
     {
-        return view('puzzles.edit', compact('puzzle'));
+        // Haal alle thema's op
+        $themes = Theme::all(); // Zorg dat je het juiste Theme model gebruikt
+
+        // Retourneer de view met de puzzel en thema's
+        return view('puzzles.edit', compact('puzzle', 'themes'));
     }
+
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Puzzle $puzzle)
     {
+        // Valideer de data
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'theme_id' => 'required|exists:themes,id',
-            'words' => 'required|array|min:1',
+            'words' => 'array|min:1',
             'words.*' => 'string|max:255',
         ]);
 
+        // Update puzzelgegevens
         $puzzle->update([
             'name' => $validated['name'],
             'theme_id' => $validated['theme_id'],
         ]);
 
         // Update woorden
-        $puzzle->words()->detach();
-        foreach ($validated['words'] as $word) {
-            $word = Word::firstOrCreate(['word' => $word]);
+        $puzzle->words()->detach(); // Oude woorden loskoppelen
+        foreach ($validated['words'] as $wordText) {
+            $word = Word::firstOrCreate(['word' => $wordText]);
             $puzzle->words()->attach($word->id);
         }
 
         return redirect()->route('puzzles.index')->with('success', 'Puzzle updated successfully.');
     }
+
 
     /**
      * Remove the specified resource from storage.

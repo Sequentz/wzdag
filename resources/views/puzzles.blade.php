@@ -12,6 +12,7 @@
                 <tr>
                     <th class="px-6 py-3 text-left text-sm font-medium">ID</th>
                     <th class="px-6 py-3 text-left text-sm font-medium">Name</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium">Detail</th>
                     <th class="px-6 py-3 text-left text-sm font-medium">Edit</th>
                     <th class="px-6 py-3 text-left text-sm font-medium">Delete</th>
                 </tr>
@@ -22,9 +23,14 @@
                 <tr class="hover:bg-gray-100">
                     <td class="px-6 py-4 text-sm text-gray-900">{{ $puzzle->id }}</td>
                     <td class="px-6 py-4 text-sm text-gray-900">{{ $puzzle->name }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">
+                        <a href="{{ route('puzzles.show', $puzzle->id) }}" class="hover:bg-green-500 text-white font-bold py-2 px-4 rounded">
+                            👁️
+                        </a>
+                    </td>
 
                     <td class="px-6 py-4 text-sm text-gray-900">
-                        <a href="{{ route('puzzles.edit', $puzzle->id) }}" class="text-blue-500 hover:text-blue-700">✏️</a>
+                        <a href="{{ route('puzzles.edit', $puzzle->id) }}" class=" hover:bg-blue-500  font-bold py-2 px-4 rounded">✏️</a>
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-900">
                         <button type="button" class="open-delete-modal hover:bg-red-700 text-white font-bold py-2 px-4 rounded" data-id="{{ $puzzle->id }}" data-name="{{ $puzzle->name }}">

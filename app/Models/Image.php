@@ -13,4 +13,8 @@ class Image extends Model
 
     public $sortable = ['id', 'file_name', 'created_at'];
     protected $fillable = ['file_name', 'file_path', 'file_extension', 'user_id'];
+    public function themes()
+    {
+        return $this->belongsToMany(Theme::class, 'theme_image');
+    }
 }

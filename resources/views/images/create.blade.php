@@ -2,7 +2,7 @@
   <x-slot name="header">
     <a href="{{ route('images.index') }}" class="align-middle bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded float-right">View images</a>
     <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-      {{ __('Add image') }}
+      {{ __('Add images') }}
     </h2>
   </x-slot>
 
@@ -10,24 +10,22 @@
     <form action="{{ route('images.store') }}" method="POST" enctype="multipart/form-data">
       @csrf
       <div>
-        <label for="image" class="block mb-2 text-3xl font-medium text-gray-900">Upload an image:</label>
+        <label for="images" class="block mb-2 text-3xl font-medium text-gray-900">Upload Images:</label>
 
-        <!-- Custom Styled File Input -->
-        <label for="image" class="cursor-pointer inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Choose File
+        <!-- Custom Styled File Input for Multiple Images -->
+        <label for="images" class="cursor-pointer inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          Choose Files
         </label>
-        <input type="file" name="image" id="image" accept="image/*" onchange="previewImage(event)" class="hidden">
-        <span id="fileName" class="ml-4 text-gray-700"></span>
+        <input type="file" name="images[]" id="images" accept="image/*" multiple onchange="previewImages(event)" class="hidden">
+        <span id="fileNames" class="ml-4 text-gray-700"></span>
       </div>
 
-      <!-- Image Preview Section -->
-      <div class="mt-4">
-        <img id="imagePreview" class="w-48 h-48 object-cover mt-2 hidden" />
-      </div>
+      <!-- Image Preview Section in a Row with Remove Button -->
+      <div id="imagePreviewContainer" class="mt-4 flex space-x-4"></div>
 
       <!-- Upload Button -->
       <button id="uploadButton" type="submit" class="hidden align-middle bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 mt-4 rounded">
-        Upload
+        Upload Images
       </button>
     </form>
 
@@ -43,35 +41,74 @@
     </ul>
     @endif
   </div>
-
 </x-app-layout>
 
-<!-- JavaScript for Image Preview and Upload Button -->
+<!-- JavaScript for Multiple Image Preview with Remove Option -->
 <script>
-  function previewImage(event) {
+  function previewImages(event) {
     const input = event.target;
-    const preview = document.getElementById('imagePreview');
-    const fileName = document.getElementById('fileName');
+    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+    const fileNames = document.getElementById('fileNames');
     const uploadButton = document.getElementById('uploadButton');
+    imagePreviewContainer.innerHTML = ''; // Clear previous previews
+    fileNames.textContent = ''; // Clear previous file names
 
-    if (input.files && input.files[0]) {
+    const files = Array.from(input.files);
+    files.forEach((file, index) => {
       const reader = new FileReader();
+
+      // Create image preview wrapper
+      const previewWrapper = document.createElement('div');
+      previewWrapper.classList.add('relative', 'w-32', 'h-32', 'overflow-hidden', 'border', 'rounded-lg');
+
+      // Create the image element
+      const imgElement = document.createElement('img');
+      imgElement.classList.add('w-full', 'h-full', 'object-cover');
+
+      // Create the delete button (cross in the top-right corner)
+      const deleteButton = document.createElement('button');
+      deleteButton.innerHTML = '&times;';
+      deleteButton.classList.add('absolute', 'top-0', 'right-0', 'bg-red-500', 'text-white', 'rounded-full', 'w-6', 'h-6', 'flex', 'items-center', 'justify-center');
+
+      deleteButton.addEventListener('click', function(event) {
+        event.preventDefault();
+        previewWrapper.remove(); // Remove the preview
+        removeFileFromSelection(input, index); // Remove file from selection
+      });
+
+      // Append elements to the preview container
+      previewWrapper.appendChild(imgElement);
+      previewWrapper.appendChild(deleteButton);
+      imagePreviewContainer.appendChild(previewWrapper);
+
+      // Load the image preview
       reader.onload = function(e) {
-        preview.src = e.target.result;
-        preview.classList.remove('hidden'); // Show the image preview
+        imgElement.src = e.target.result;
       };
-      reader.readAsDataURL(input.files[0]); // Read the image file as a data URL
+      reader.readAsDataURL(file);
 
-      // Display the file name beside the button
-      fileName.textContent = input.files[0].name;
+      // Append file names
+      fileNames.textContent += `${file.name}, `;
+    });
 
-      // Show the Upload button
+    // Show the Upload button if there are files
+    if (files.length > 0) {
       uploadButton.classList.remove('hidden');
     } else {
-      // Hide the preview and upload button if no file is selected
-      preview.classList.add('hidden');
       uploadButton.classList.add('hidden');
-      fileName.textContent = '';
+      fileNames.textContent = '';
     }
+  }
+
+  // Remove file from the input's file list
+  function removeFileFromSelection(input, indexToRemove) {
+    const dt = new DataTransfer();
+
+    // Add all files except the one that should be removed
+    Array.from(input.files)
+      .filter((file, index) => index !== indexToRemove)
+      .forEach(file => dt.items.add(file));
+
+    input.files = dt.files; // Update the input's files property
   }
 </script>
