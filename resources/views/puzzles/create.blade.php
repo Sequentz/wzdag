@@ -11,13 +11,13 @@
       @csrf
       <div>
         <label for="name" class="block mb-2 text-3xl font-medium text-gray-900">Puzzle Name:</label>
-        <input type="text" name="name" id="name" required class="block w-full mt-1 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 rounded-md">
+        <input type="text" name="name" id="name" class="block w-full mt-1 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 rounded-md">
       </div>
 
       <!-- Thema Selectie -->
       <div class="mt-4">
         <label for="theme_id" class="block mb-2 text-2xl font-medium text-gray-900">Select Theme:</label>
-        <select name="theme_id" id="theme_id" required class="block w-full mt-1 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 rounded-md">
+        <select name="theme_id" id="theme_id" class="block w-full mt-1 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 rounded-md">
           @foreach($themes as $theme)
           <option value="{{ $theme->id }}">{{ $theme->name }}</option>
           @endforeach

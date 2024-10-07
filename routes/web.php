@@ -32,4 +32,8 @@ Route::middleware([
 Route::resource('themes', ThemeController::class);
 Route::resource('images', ImageController::class);
 Route::resource('puzzles', PuzzleController::class);
+
+
+
 Route::get('themes/{theme}/images', [ThemeController::class, 'getImages']);
+Route::delete('/images/{id}', [ThemeController::class, 'destroyImage'])->name('themes.images.destroy');

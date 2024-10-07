@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('theme_image', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('theme_id')->constrained()->nullable()->onDelete('cascade');
-            $table->foreignId('image_id')->constrained()->nullable()->onDelete('restrict');
-            $table->timestamps();
+        Schema::table('remove_cascade', function (Blueprint $table) {
+            //
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('theme_image');
+        Schema::table('remove_cascade', function (Blueprint $table) {
+            //
+        });
     }
 };

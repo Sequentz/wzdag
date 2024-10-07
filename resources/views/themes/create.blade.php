@@ -14,7 +14,7 @@
         <input type="text" name="name" id="name" required class="block w-full mt-1 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 rounded-md">
       </div>
 
-      <!-- Meerdere Afbeeldingen Uploaden -->
+      <!-- Multiple Image Upload Section -->
       <div class="mt-4">
         <label for="images" class="block mb-2 text-3xl font-medium text-gray-900">Upload Images:</label>
         <input type="file" name="images[]" id="images" accept="image/*" multiple onchange="previewImages(event)" class="block w-full mt-1 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 rounded-md">
@@ -45,12 +45,16 @@
 
 <!-- JavaScript to handle multiple image previews and removal -->
 <script>
+  const allFiles = new DataTransfer();
+
   function previewImages(event) {
     const input = event.target;
     const previewContainer = document.getElementById('imagePreviewContainer');
-    previewContainer.innerHTML = ''; // Clear previous previews
 
+    // Add new files to allFiles and create previews
     Array.from(input.files).forEach((file, index) => {
+      allFiles.items.add(file); // Add new file to DataTransfer object
+
       const reader = new FileReader();
 
       // Create a wrapper for the image and delete button
@@ -69,7 +73,7 @@
       deleteButton.addEventListener('click', function(event) {
         event.preventDefault();
         previewWrapper.remove(); // Remove the preview
-        removeFileFromSelection(input, index); // Remove file from selection
+        removeFileFromSelection(index); // Remove the file from selection
       });
 
       // Append elements to the preview container
@@ -83,17 +87,25 @@
       };
       reader.readAsDataURL(file);
     });
+
+    // Update input with new file list
+    input.files = allFiles.files;
   }
 
   // Remove file from the input's file list
-  function removeFileFromSelection(input, indexToRemove) {
-    const dt = new DataTransfer();
+  function removeFileFromSelection(indexToRemove) {
+    const newFiles = new DataTransfer();
 
     // Add all files except the one that should be removed
-    Array.from(input.files)
+    Array.from(allFiles.files)
       .filter((file, index) => index !== indexToRemove)
-      .forEach(file => dt.items.add(file));
+      .forEach(file => newFiles.items.add(file));
 
-    input.files = dt.files; // Update the input's files property
+    // Replace the original allFiles with the updated file list
+    allFiles.items.clear();
+    Array.from(newFiles.files).forEach(file => allFiles.items.add(file));
+
+    // Update the input with the new file list
+    document.getElementById('images').files = allFiles.files;
   }
 </script>

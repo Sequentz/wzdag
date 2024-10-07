@@ -6,6 +6,8 @@ use App\Models\Theme;
 use Illuminate\Http\Request;
 use App\Models\Image;
 
+use Illuminate\Support\Facades\Storage;
+
 class ThemeController extends Controller
 {
     /**
@@ -14,8 +16,6 @@ class ThemeController extends Controller
     public function index()
     {
         $themes = Theme::sortable()->paginate(10);
-
-        // Retourneer de index view met de afbeeldingen
         return view('themes', compact('themes'));
     }
 
@@ -34,40 +34,36 @@ class ThemeController extends Controller
 
     public function store(Request $request)
     {
-        // Valideer dat de naam van het thema aanwezig is en dat er afbeeldingen zijn geüpload
-        $validated = $request->validate([
+
+        $request->validate([
             'name' => 'required|string|max:255',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Valideer dat de geüploade bestanden afbeeldingen zijn
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        // Maak het thema aan
-        $theme = Theme::create(['name' => $validated['name']]);
 
-        // Controleer of er bestanden zijn geüpload
+        $theme = Theme::create([
+            'name' => $request->name,
+        ]);
+
+
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $file) {
-                // Sla de afbeelding op in de 'uploads' map binnen 'public'
                 $filePath = $file->store('uploads', 'public');
-                // Haal de originele bestandsnaam op
                 $fileName = $file->getClientOriginalName();
-                // Haal de bestandsextensie op
                 $fileExtension = $file->getClientOriginalExtension();
 
-                // Maak een nieuwe afbeelding aan en sla deze op in de database
-                $image = Image::create([
-                    'file_name' => $fileName, // De originele bestandsnaam
-                    'file_path' => $filePath, // Het bestandspad waar de afbeelding is opgeslagen
-                    'file_extension' => $fileExtension, // De extensie van het bestand
-                    'user_id' => auth()->id(),  // Koppel de afbeelding aan de ingelogde gebruiker (optioneel)
-                ]);
 
-                // Koppel de afbeelding aan het thema via de many-to-many relatie
-                $theme->images()->attach($image->id);
+                $theme->images()->create([
+                    'file_name' => $fileName,
+                    'file_path' => $filePath,
+                    'file_extension' => $fileExtension,
+                ]);
             }
         }
 
-        return redirect()->route('themes.index')->with('success', 'Theme and images uploaded successfully.');
+        return redirect()->route('themes.index')->with('success', 'Theme created successfully with images.');
     }
+
 
 
 
@@ -82,24 +78,56 @@ class ThemeController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Theme $theme)
+
+
+    public function edit($id)
     {
-        return view('themes.edit', compact('theme'));
+        $theme = Theme::find($id);
+
+        if (!$theme) {
+            return redirect()->route('themes.index')->withErrors('Theme not found.');
+        }
+
+        $images = $theme->images;
+
+        return view('themes.edit', compact('theme', 'images'));
     }
 
     /**
      * Update the specified resource in storage.
-     */
-    public function update(Request $request, Theme $theme)
+     */ public function update(Request $request, Theme $theme)
     {
-        $validated = $request->validate([
+        // Validate data
+        $request->validate([
             'name' => 'required|string|max:255',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validate multiple images
         ]);
 
-        $theme->update($validated);
+        // Update theme name
+        $theme->update(['name' => $request->name]);
+
+        // Handle additional image uploads
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $filePath = $file->store('uploads', 'public');
+                $fileName = $file->getClientOriginalName();
+                $fileExtension = $file->getClientOriginalExtension();
+
+                // Save the image and associate it with the theme
+                $theme->images()->create([
+                    'file_name' => $fileName,
+                    'file_path' => $filePath,
+                    'file_extension' => $fileExtension,
+                ]);
+            }
+        }
 
         return redirect()->route('themes.index')->with('success', 'Theme updated successfully.');
     }
+
+
+
+
 
     /**
      * Remove the specified resource from storage.
@@ -117,5 +145,20 @@ class ThemeController extends Controller
         return response()->json([
             'images' => $theme->images
         ]);
+    }
+
+    public function destroyImage($imageId)
+    {
+        // Find the image
+        $image = Image::findOrFail($imageId);
+
+        // Detach the image from the themes it is associated with
+        $image->themes()->detach();
+
+        // Delete the image itself
+        Storage::delete('public/' . $image->file_path);
+        $image->delete();
+
+        return redirect()->back()->with('success', 'Image deleted successfully.');
     }
 }

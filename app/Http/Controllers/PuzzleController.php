@@ -34,21 +34,29 @@ class PuzzleController extends Controller
      */
     public function store(Request $request)
     {
-        // Valideer de puzzel en de woorden
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'theme_id' => 'required|exists:themes,id',
             'words' => 'required|array|min:1',
             'words.*' => 'string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048' // Optionele afbeelding
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+        ], [
+            'name.required' => 'The name field is required.',
+            'theme_id.required' => 'The theme id field is required.',
+            'theme_id.exists' => 'The selected theme is invalid.',
+            'words.0.string' => 'The first word must be a string.',
+            'words.1.string' => 'The second word must be a string.',
+            'words.2.string' => 'The third word must be a string.',
+            // You can add messages for other word indices or a general message for all
+            'words.*.string' => 'Each word must be a valid string.',
         ]);
 
-        // Maak een nieuwe puzzel aan
         $puzzle = new Puzzle();
         $puzzle->name = $validated['name'];
         $puzzle->theme_id = $validated['theme_id'];
 
-        // Opslaan van de afbeelding als deze is geüpload
+
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('images', 'public');
             $puzzle->image_id = Image::create(['file_path' => $imagePath])->id;
@@ -75,7 +83,6 @@ class PuzzleController extends Controller
         $image = $puzzle->image;
         $words = $puzzle->words;
 
-
         return view('puzzles.show', compact('puzzle', 'theme', 'image', 'words'));
     }
 
@@ -84,13 +91,10 @@ class PuzzleController extends Controller
      */
     public function edit(Puzzle $puzzle)
     {
-        // Haal alle thema's op
+
         $themes = Theme::all();
+        $images = $puzzle->theme->images;
 
-        // Haal alle afbeeldingen van het geselecteerde thema van de puzzel
-        $images = $puzzle->theme->images; // Zorg ervoor dat de relatie correct is ingesteld
-
-        // Retourneer de view met de puzzel, thema's en afbeeldingen
         return view('puzzles.edit', compact('puzzle', 'themes', 'images'));
     }
 
@@ -101,23 +105,22 @@ class PuzzleController extends Controller
      */
     public function update(Request $request, Puzzle $puzzle)
     {
-        // Valideer de data
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'theme_id' => 'required|exists:themes,id',
-            'image_id' => 'required|exists:images,id', // Zorg ervoor dat de afbeelding bestaat
+            'image_id' => 'required|exists:images,id',
             'words' => 'array|min:1',
             'words.*' => 'string|max:255',
         ]);
 
-        // Update puzzelgegevens
         $puzzle->update([
             'name' => $validated['name'],
             'theme_id' => $validated['theme_id'],
-            'image_id' => $validated['image_id'], // Update de gekoppelde afbeelding
+            'image_id' => $validated['image_id'],
         ]);
 
-        // Update woorden
+
         $puzzle->words()->detach();
         foreach ($validated['words'] as $wordText) {
             $word = Word::firstOrCreate(['word' => $wordText]);
