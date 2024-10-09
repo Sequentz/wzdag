@@ -100,20 +100,18 @@ class ThemeController extends Controller
         // Validate data
         $request->validate([
             'name' => 'required|string|max:255',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validate multiple images
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        // Update theme name
         $theme->update(['name' => $request->name]);
 
-        // Handle additional image uploads
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $file) {
                 $filePath = $file->store('uploads', 'public');
                 $fileName = $file->getClientOriginalName();
                 $fileExtension = $file->getClientOriginalExtension();
 
-                // Save the image and associate it with the theme
+
                 $theme->images()->create([
                     'file_name' => $fileName,
                     'file_path' => $filePath,

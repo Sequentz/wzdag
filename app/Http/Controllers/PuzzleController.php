@@ -34,7 +34,6 @@ class PuzzleController extends Controller
      */
     public function store(Request $request)
     {
-
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'theme_id' => 'required|exists:themes,id',
@@ -48,29 +47,38 @@ class PuzzleController extends Controller
             'words.0.string' => 'The first word must be a string.',
             'words.1.string' => 'The second word must be a string.',
             'words.2.string' => 'The third word must be a string.',
-            // You can add messages for other word indices or a general message for all
             'words.*.string' => 'Each word must be a valid string.',
         ]);
 
+        // Create a new Puzzle instance
         $puzzle = new Puzzle();
         $puzzle->name = $validated['name'];
         $puzzle->theme_id = $validated['theme_id'];
 
-
+        // Handle image upload if present
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('images', 'public');
-            $puzzle->image_id = Image::create(['file_path' => $imagePath])->id;
+            // Create an image record and associate it with the puzzle
+            $image = Image::create([
+                'file_path' => $imagePath,
+                'file_name' => $request->file('image')->getClientOriginalName(),  // Optional: Store original file name
+                'file_extension' => $request->file('image')->getClientOriginalExtension(),  // Optional: Store file extension
+            ]);
+            $puzzle->image_id = $image->id;  // Assign image ID to the puzzle
         }
 
+        // Save the puzzle
         $puzzle->save();
 
+        // Attach words to the puzzle
         foreach ($validated['words'] as $wordText) {
-            $word = Word::firstOrCreate(['word' => $wordText]);
-            $puzzle->words()->attach($word->id);
+            $word = Word::firstOrCreate(['word' => $wordText]);  // Create the word if it doesn't exist
+            $puzzle->words()->attach($word->id);  // Attach word to the puzzle
         }
 
         return redirect()->route('puzzles.index')->with('success', 'Puzzle successfully created.');
     }
+
 
 
     /**

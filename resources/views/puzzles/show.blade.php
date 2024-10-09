@@ -19,15 +19,14 @@
       </div>
 
       <!-- Puzzle Image -->
-      <div class="flex justify-center items-center">
-        @if($image)
-        <div class="border border-gray-200 p-2 rounded-lg shadow-md">
-          <img src="{{ asset('storage/' . $image->file_path) }}" alt="Puzzle Image" class="w-48 h-48 object-cover rounded-lg">
-        </div>
+      <div class="border border-gray-200 p-2 rounded-lg shadow-md">
+        @if($puzzle->image)
+        <img src="{{ asset('storage/' . $puzzle->image->file_path) }}" alt="Puzzle Image" class="w-48 h-48 object-cover rounded-lg">
         @else
-        <p class="text-gray-500">No image available for this puzzle.</p>
+        <p>No image selected for this puzzle.</p>
         @endif
       </div>
+
     </div>
 
     <!-- Words of the Puzzle -->

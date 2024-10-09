@@ -23,10 +23,7 @@
         <div id="imagePreviewContainer" class="flex space-x-4">
           @foreach($images as $image)
           <div class="relative" id="existing-image-{{ $image->id }}">
-            <!-- Image preview -->
             <img src="{{ asset('storage/' . $image->file_path) }}" alt="Image" class="w-32 h-32 object-cover border rounded-lg">
-
-            <!-- Properly positioned delete button -->
             <form action="{{ route('images.destroy', $image->id) }}" method="POST" class="absolute top-0 right-0">
               @csrf
               @method('DELETE')
@@ -39,16 +36,16 @@
         </div>
       </div>
 
-      <!-- Upload Additional Images -->
+
       <div class="mt-4">
         <label for="images" class="block mb-2 text-3xl font-medium text-gray-900">Upload Additional Images:</label>
         <input type="file" name="images[]" id="images" accept="image/*" multiple onchange="previewAdditionalImages(event)" class="block w-full mt-1 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 rounded-md">
       </div>
 
-      <!-- Additional Image Previews -->
+
       <div id="additionalImagePreviewContainer" class="flex space-x-4 mt-4"></div>
 
-      <!-- Save Changes Button -->
+
       <button type="submit" class="align-middle bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 mt-4 rounded">
         Save Changes
       </button>
