@@ -8,6 +8,8 @@ use App\Models\Word;
 use App\Models\Theme;
 use App\Models\Image;
 
+use App\Http\Requests\StorePuzzleRequest;
+
 
 class PuzzleController extends Controller
 {
@@ -32,39 +34,26 @@ class PuzzleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'theme_id' => 'required|exists:themes,id',
-            'words' => 'required|array|min:1',
-            'words.*' => 'string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
-        ], [
-            'name.required' => 'The name field is required.',
-            'theme_id.required' => 'The theme id field is required.',
-            'theme_id.exists' => 'The selected theme is invalid.',
-            'words.0.string' => 'The first word must be a string.',
-            'words.1.string' => 'The second word must be a string.',
-            'words.2.string' => 'The third word must be a string.',
-            'words.*.string' => 'Each word must be a valid string.',
-        ]);
 
-        // Create a new Puzzle instance
+    public function store(StorePuzzleRequest $request)
+    {
+        $validated = $request->validated();
+
+
         $puzzle = new Puzzle();
         $puzzle->name = $validated['name'];
         $puzzle->theme_id = $validated['theme_id'];
 
-        // Handle image upload if present
+
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('images', 'public');
-            // Create an image record and associate it with the puzzle
+
             $image = Image::create([
                 'file_path' => $imagePath,
-                'file_name' => $request->file('image')->getClientOriginalName(),  // Optional: Store original file name
-                'file_extension' => $request->file('image')->getClientOriginalExtension(),  // Optional: Store file extension
+                'file_name' => $request->file('image')->getClientOriginalName(),
+                'file_extension' => $request->file('image')->getClientOriginalExtension(),
             ]);
-            $puzzle->image_id = $image->id;  // Assign image ID to the puzzle
+            $puzzle->image_id = $image->id;
         }
 
         // Save the puzzle
