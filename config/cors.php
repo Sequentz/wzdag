@@ -15,13 +15,13 @@ return [
     |
     */
 
-    'paths' => ['api/*'],
+    'paths' => ['api/v1/*'],
 
-    'allowed_methods' => ['*'], // Allow all HTTP methods (GET, POST, etc.)
+    'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:5173'], // Allow requests from your local development server
+    'allowed_origins' => ['*'],
 
-    'allowed_headers' => ['*'], // Allow all headers
+    'allowed_headers' => ['*'],
 
     'exposed_headers' => [],
 
