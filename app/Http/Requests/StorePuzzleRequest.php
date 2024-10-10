@@ -37,9 +37,7 @@ class StorePuzzleRequest extends FormRequest
             'name.required' => 'The name field is required.',
             'theme_id.required' => 'The theme id field is required.',
             'theme_id.exists' => 'The selected theme is invalid.',
-            'words.0.string' => 'The first word must be a string.',
-            'words.1.string' => 'The second word must be a string.',
-            'words.2.string' => 'The third word must be a string.',
+            'words.required' => 'The words field is required.',
             'words.*.string' => 'Each word must be a valid string.',
         ];
     }
