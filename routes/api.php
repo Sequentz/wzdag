@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GameController;
 use App\Http\Controllers\Api\V1\WordApiController;
 use App\Http\Controllers\Api\V1\PuzzleApiController;
 use App\Http\Controllers\Api\V1\ThemeApiController;
@@ -30,5 +31,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::apiResource('/words', WordApiController::class);
         Route::apiResource('/puzzles', PuzzleApiController::class);
         Route::apiResource('/themes', ThemeApiController::class);
+        Route::get('/play', [GameController::class, 'playGame']);
     });
 });
