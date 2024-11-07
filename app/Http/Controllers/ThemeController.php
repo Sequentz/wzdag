@@ -95,15 +95,16 @@ class ThemeController extends Controller
 
     /**
      * Update the specified resource in storage.
-     */ public function update(Request $request, Theme $theme)
+     */ public function update(Request $request,  $id)
     {
+        // dd('Update mijn afbeeldingen');
         // Validate data
         $request->validate([
             'name' => 'required|string|max:255',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $theme->update(['name' => $request->name]);
+        $id->update(['theme' => $request->theme]);
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $file) {
@@ -112,7 +113,7 @@ class ThemeController extends Controller
                 $fileExtension = $file->getClientOriginalExtension();
 
 
-                $theme->images()->create([
+                $id->images()->create([
                     'file_name' => $fileName,
                     'file_path' => $filePath,
                     'file_extension' => $fileExtension,

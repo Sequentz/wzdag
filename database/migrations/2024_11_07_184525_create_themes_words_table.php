@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('puzzle_word', function (Blueprint $table) {
+        Schema::create('themes_words', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('puzzle_id')->constrained()->nullable()->onDelete('cascade');
-            $table->foreignId('word_id')->constrained()->nullable()->onDelete('cascade');
+            $table->foreignId('theme_id')->constrained();
+            $table->foreignId('word_id')->constrained();
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('puzzle_word');
+        Schema::dropIfExists('themes_words');
     }
 };

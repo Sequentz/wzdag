@@ -16,8 +16,9 @@ class Image extends Model
     {
         return $this->belongsToMany(Theme::class, 'theme_image');
     }
+
     public function puzzles()
     {
-        return $this->hasMany(Puzzle::class);
+        return $this->hasMany(Puzzle::class, 'image_id');
     }
 }

@@ -25,14 +25,15 @@ class Puzzle extends Model
     }
 
 
-    public function image()
-    {
-        return $this->belongsTo(Image::class);
-    }
+
 
 
     public function words()
     {
         return $this->belongsToMany(Word::class, 'puzzle_word');
+    }
+    public function image()
+    {
+        return $this->belongsTo(Image::class, 'image_id');
     }
 }

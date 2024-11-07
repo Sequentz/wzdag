@@ -137,4 +137,9 @@ class PuzzleController extends Controller
         $puzzle->delete();
         return redirect()->route('puzzles.index')->with('success', 'Puzzle deleted successfully.');
     }
+
+    public function image()
+    {
+        return $this->belongsTo(Image::class, 'image_id');
+    }
 }
