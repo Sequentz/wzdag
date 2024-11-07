@@ -23,8 +23,8 @@
                     </x-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="{{ route('puzzles.index') }}" :active="request()->routeIs('puzzles.index')">
-                        {{ __('Puzzles') }}
+                    <x-nav-link href="{{ route('words.index') }}" :active="request()->routeIs('words.index')">
+                        {{ __('Words') }}
                     </x-nav-link>
                 </div>
             </div>

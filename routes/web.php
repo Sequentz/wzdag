@@ -1,9 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ThemeController;
-use App\Http\Controllers\PuzzleController;
+use App\Http\Controllers\WordController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -30,8 +29,8 @@ Route::middleware([
 });
 
 Route::resource('themes', ThemeController::class);
-Route::resource('images', ImageController::class);
-Route::resource('puzzles', PuzzleController::class);
+Route::resource('words', WordController::class);
+
 
 
 

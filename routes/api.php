@@ -27,9 +27,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::prefix('v1')->group(function () {
 
-    // Get all
+
     Route::apiResource('/words', WordApiController::class);
-    Route::apiResource('/puzzles', PuzzleApiController::class);
-    Route::apiResource('/themes', ThemeApiController::class);
-    Route::get('/play', [GameController::class, 'playGame']);
+    Route::apiResource('/themes', PuzzleApiController::class);
 });
